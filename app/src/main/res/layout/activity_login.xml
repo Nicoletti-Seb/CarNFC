@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
-                    android:text="ninja@unice.fr" />
+                    android:text="m1@ninja.fr" />
                 <!--android:hint="@string/prompt_email"-->
 
             </android.support.design.widget.TextInputLayout>

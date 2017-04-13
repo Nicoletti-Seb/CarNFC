@@ -315,16 +315,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
+            Log.i("UserLoginTask","constructor");
         }
 
         @Override
         protected String doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-
+            Log.i("doInBackground","method");
             // json to send
             Login log = new Login(mEmail, mPassword);
             Gson gson = new Gson();
             String stringJson = gson.toJson(log);
+            Log.i("stringJson", stringJson);
 
             // url web service
             String server = getResources().getString(R.string.url_server);
@@ -360,7 +362,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 //Close
                 connection.disconnect();
-
+                Log.i("result", result.toString());
                 return result.toString();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -377,7 +379,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             JsonObject jsonObject = gson.fromJson(success, JsonObject.class);
             System.out.println("reponse content : " + jsonObject);
 
-            if (jsonObject.get("success").getAsBoolean()) {
+            /*if (jsonObject.get("success").getAsBoolean()) {
                 Person person = gson.fromJson(jsonObject.get("user"), Person.class);
                 Log.i("Person connected", person.toString());
 
@@ -388,7 +390,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } else {
                 mPasswordView.setError(jsonObject.get("message").toString());
                 mPasswordView.requestFocus();
-            }
+            }*/
         }
 
         @Override
