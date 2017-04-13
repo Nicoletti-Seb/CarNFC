@@ -15,6 +15,7 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -27,22 +28,37 @@ public class NFCActivity extends AppCompatActivity {
 
     private static final String TAG = "NFCActivity";
 
+    private TextView nfcState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfcreader);
+
+        nfcState = (TextView) findViewById(R.id.nfc_state);
     }
 
     private void resolveIntent(final Intent intent){
-        new AsyncTask<Void, Void, Void>(){
+        new AsyncTask<Void, String, Void>(){
             @Override
             protected Void doInBackground(Void... voids) {
                 if(NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())){
+                    publishProgress("READING");
                     Log.i(TAG, readTag(intent));
+
+                    publishProgress("WRITING");
                     writeTag(intent, "coucou");
+
+                    publishProgress("READING");
                     Log.i(TAG, readTag(intent));
                 }
                 return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(String... values) {
+                nfcState.setText(values[0]);
+
             }
         }.execute();
     }
