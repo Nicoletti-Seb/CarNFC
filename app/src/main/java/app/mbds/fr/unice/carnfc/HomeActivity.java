@@ -1,6 +1,8 @@
 package app.mbds.fr.unice.carnfc;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -10,13 +12,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
-import app.mbds.fr.unice.carnfc.map.MapGeolocalisation;
+import app.mbds.fr.unice.carnfc.map.MapGeolocation;
 
 public class HomeActivity extends Activity implements OnMapReadyCallback{
 
     private static final String TAG = "HomeActivity";
 
-    private MapGeolocalisation mapGeolocalisation;
+    private MapGeolocation mapGeolocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,8 @@ public class HomeActivity extends Activity implements OnMapReadyCallback{
             return;
         }
 
-        mapGeolocalisation = new MapGeolocalisation(this, googleMap);
-        mapGeolocalisation.start();
+        mapGeolocation = new MapGeolocation(this, googleMap);
+        mapGeolocation.start();
     }
 
 
@@ -52,8 +54,8 @@ public class HomeActivity extends Activity implements OnMapReadyCallback{
     protected void onResume() {
         super.onResume();
 
-        if(mapGeolocalisation != null){
-            mapGeolocalisation.start();
+        if(mapGeolocation != null){
+            mapGeolocation.start();
         }
     }
 
@@ -61,8 +63,8 @@ public class HomeActivity extends Activity implements OnMapReadyCallback{
     protected void onStop() {
         super.onStop();
 
-        if(mapGeolocalisation != null){
-            mapGeolocalisation.stop();
+        if(mapGeolocation != null){
+            mapGeolocation.stop();
         }
     }
 }

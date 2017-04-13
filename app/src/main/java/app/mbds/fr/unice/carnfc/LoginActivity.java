@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,8 +31,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import app.mbds.fr.unice.carnfc.entity.Person;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -295,7 +307,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private final String mEmail;
         private final String mPassword;
@@ -306,40 +318,75 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
+            // json to send
+            Login log = new Login(mEmail, mPassword);
+            Gson gson = new Gson();
+            String stringJson = gson.toJson(log);
+
+            // url web service
+            String server = getResources().getString(R.string.url_server);
+            String service = getResources().getString(R.string.url_service_login);
+
+            // string response
+            StringBuilder result = new StringBuilder();
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+                URL url = new URL(server + service);
+                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Charset", "UTF-8");
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                connection.setChunkedStreamingMode(0);
+                connection.connect();
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                //Write data
+                OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
+                osw.write(stringJson);
+                osw.flush();
+                osw.close();
+
+                int codeResponse = connection.getResponseCode();
+                if( 200 <= codeResponse && codeResponse < 300 ){
+                    BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String line = null;
+                    while((line = br.readLine()) != null){
+                        result.append(line);
+                    }
+                    br.close();
                 }
-            }
 
-            // TODO: register the new account here.
-            return true;
+                //Close
+                connection.disconnect();
+
+                return result.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final String success) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
+            Gson gson = new Gson();
+            JsonObject jsonObject = gson.fromJson(success, JsonObject.class);
+            System.out.println("reponse content : " + jsonObject);
+
+            if (jsonObject.get("success").getAsBoolean()) {
+                Person person = gson.fromJson(jsonObject.get("user"), Person.class);
+                Log.i("Person connected", person.toString());
+
                 Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(i);
 
                 finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.setError(jsonObject.get("message").toString());
                 mPasswordView.requestFocus();
             }
         }
@@ -348,6 +395,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    private class Login {
+
+        private String email;
+        private String password;
+
+        public Login(String email, String password) {
+            this.email = email;
+            this.password = password;
         }
     }
 }

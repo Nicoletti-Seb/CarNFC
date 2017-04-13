@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="geolocation_interval">10000</integer>
+    <integer name="geolocation_fastest_interval">5000</integer>
+</resources>

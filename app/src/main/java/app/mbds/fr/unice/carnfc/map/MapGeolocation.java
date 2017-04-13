@@ -20,11 +20,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import app.mbds.fr.unice.carnfc.R;
+
 /**
  * Created by 53js-Seb on 16/01/2017.
  */
 
-public class MapGeolocalisation implements GoogleApiClient.ConnectionCallbacks,
+public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private Context context;
@@ -33,7 +35,7 @@ public class MapGeolocalisation implements GoogleApiClient.ConnectionCallbacks,
     private Marker currentLoc;
 
 
-    public MapGeolocalisation(Context context, GoogleMap googleMap) {
+    public MapGeolocation(Context context, GoogleMap googleMap) {
         this.context = context;
         this.googleMap = googleMap;
 
@@ -54,8 +56,8 @@ public class MapGeolocalisation implements GoogleApiClient.ConnectionCallbacks,
 
     private LocationRequest createLocationRequest() {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000); //10s TODO Remove constantes
-        locationRequest.setFastestInterval(5000);//5s
+        locationRequest.setInterval(context.getResources().getInteger(R.integer.geolocation_interval)); //10s
+        locationRequest.setFastestInterval(context.getResources().getInteger(R.integer.geolocation_fastest_interval));//5s
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         return locationRequest;
