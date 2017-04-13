@@ -4,6 +4,7 @@
     <!-- url services -->
     <string name="url_server">127.0.0.1:11111/</string>
     <string name="url_service_login">person/login</string>
+    <string name="url_service_register">person/add</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -17,4 +18,20 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- Register activity -->
+    <string name="register_message">Veuillez saisir vos informations</string>
+    <string name="register_male">Masculin</string>
+    <string name="register_female">Féminin</string>
+    <string name="register_register">S\'enregistrer</string>
+    <string name="register_lastname">Votre nom</string>
+    <string name="register_firstname">Votre prenom</string>
+    <string name="register_phone">Téléphone portable</string>
+    <string name="register_email">E-mail</string>
+    <string name="register_password">Mot de passe</string>
+    <string name="register_password_verify">Confirmation mot de passe</string>
+    <string name="please_wait">Loading...</string>
+    <string name="inscription_error_field_empty">Le champ est vide...</string>
+    <string name="inscription_error_identical_password">Mot de passe non identique...</string>
+    <string name="inscription_ok">Inscription terminée !</string>
 </resources>
