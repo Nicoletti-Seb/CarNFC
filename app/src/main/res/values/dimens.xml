@@ -10,4 +10,15 @@
     <dimen name="form_name_margin_bottom">10dp</dimen>
     <dimen name="form_component_margin_top">5dp</dimen>
     <dimen name="form_component_margin_bottom">5dp</dimen>
+
+    <!-- Menu item map -->
+    <dimen name="menu_item_radius">10dp</dimen>
+    <dimen name="menu_item_padding_bottom">10dp</dimen>
+    <dimen name="menu_item_padding_top">10dp</dimen>
+    <dimen name="menu_item_padding_left">10dp</dimen>
+    <dimen name="menu_item_padding_right">10dp</dimen>
+
+    <!-- layout menu item map -->
+    <dimen name="layout_menu_item_margin">7dp</dimen>
+
 </resources>

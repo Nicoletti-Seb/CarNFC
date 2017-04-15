@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+android:shape="oval">
+<stroke android:width="2dp" android:color="@color/menu_item_border" />
+<corners
+    android:bottomRightRadius="@dimen/menu_item_radius"
+    android:bottomLeftRadius="@dimen/menu_item_radius"
+    android:topLeftRadius="@dimen/menu_item_radius"
+    android:topRightRadius="@dimen/menu_item_radius"/>
+<gradient
+    android:startColor="@color/menu_item_background"
+    android:endColor="@color/menu_item_background"/>
+<padding
+    android:bottom="@dimen/menu_item_padding_bottom"
+    android:top="@dimen/menu_item_padding_top"
+    android:left="@dimen/menu_item_padding_left"
+    android:right="@dimen/menu_item_padding_right"/>
+
+</shape>

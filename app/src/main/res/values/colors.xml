@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- Menu item map -->
+    <color name="menu_item_border">#FFFFFF</color>
+    <color name="menu_item_background">#4444FF</color>
+
 </resources>
