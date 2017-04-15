@@ -1,6 +1,7 @@
 package app.mbds.fr.unice.carnfc;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
@@ -12,6 +13,7 @@ import android.nfc.tech.NdefFormatable;
 import android.os.AsyncTask;
 import android.os.Message;
 import android.os.Parcelable;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,19 +41,30 @@ public class NFCActivity extends AppCompatActivity {
     }
 
     private void resolveIntent(final Intent intent){
+        if(!NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            return;
+        }
+
         new AsyncTask<Void, String, Void>(){
             @Override
             protected Void doInBackground(Void... voids) {
-                if(NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())){
-                    publishProgress("READING");
-                    Log.i(TAG, readTag(intent));
+                publishProgress("READING");
 
-                    publishProgress("WRITING");
-                    writeTag(intent, "coucou");
+                if( ActionNFC.OUT_LOCATION.getAction().equals(readTag(intent)) ){
+                    //TODO: OUT_LOCATION
 
-                    publishProgress("READING");
-                    Log.i(TAG, readTag(intent));
+                    //Write the next action
+                    publishProgress("WRITING SAVE_LOCATION");
+                    writeTag(intent, ActionNFC.SAVE_LOCATION.getAction());
+                } else {
+
+                    //TODO: SAVE_LOCATION
+
+                    //Write the next action
+                    publishProgress("WRITING OUT_LOCATION");
+                    writeTag(intent, ActionNFC.OUT_LOCATION.getAction());
                 }
+
                 return null;
             }
 
@@ -59,6 +72,19 @@ public class NFCActivity extends AppCompatActivity {
             protected void onProgressUpdate(String... values) {
                 nfcState.setText(values[0]);
 
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                Vibrator v = (Vibrator) NFCActivity.this.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(NFCActivity.this.getResources().getInteger(R.integer.delay_vibrator));
+
+                Intent intent = new Intent(NFCActivity.this, HomeActivity.class);
+                startActivity(intent);
+
+                NFCActivity.this.finish();
             }
         }.execute();
     }
@@ -173,5 +199,21 @@ public class NFCActivity extends AppCompatActivity {
         Intent intent = new Intent(this, this.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent.getActivity(this, 0, intent, 0);
         resolveIntent(getIntent());
+    }
+
+
+    enum ActionNFC {
+        SAVE_LOCATION("SAVE_LOCATION"),
+        OUT_LOCATION("OUT_LOCATION");
+
+        private String action;
+
+        ActionNFC(String action){
+            this.action = action;
+        }
+
+        public String getAction(){
+            return action;
+        }
     }
 }
