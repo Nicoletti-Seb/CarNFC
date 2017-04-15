@@ -56,6 +56,7 @@ public class NFCActivity extends AppCompatActivity {
                     //Write the next action
                     publishProgress("WRITING SAVE_LOCATION");
                     writeTag(intent, ActionNFC.SAVE_LOCATION.getAction());
+                    
                 } else {
 
                     //TODO: SAVE_LOCATION
@@ -170,7 +171,6 @@ public class NFCActivity extends AppCompatActivity {
                 }
             }else { //Format tag
                 NdefFormatable format =	NdefFormatable.get(tag);
-
                 if(format == null){
                     return;
                 }
@@ -181,8 +181,10 @@ public class NFCActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Toast.makeText(this, "Error Write Tag: IOException", Toast.LENGTH_LONG).show();
         } catch (FormatException e) {
             e.printStackTrace();
+            Toast.makeText(this, "Error Write Tag: FormatException", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -119,10 +119,14 @@ public class HomeActivity extends Activity implements OnMapReadyCallback, View.O
                 animateMenus();
                 break;
             case R.id.btn_car_location:
-                Toast.makeText(this, "location", Toast.LENGTH_SHORT).show();
+                if(mapGeolocation != null){
+                    mapGeolocation.activeModeSearchCar();
+                }
                 break;
             case R.id.btn_parking:
-                Toast.makeText(this, "parking", Toast.LENGTH_SHORT).show();
+                if(mapGeolocation != null){
+                    mapGeolocation.activeModeSearchParking();
+                }
                 break;
             case R.id.btn_account:
                 Toast.makeText(this, "account", Toast.LENGTH_SHORT).show();

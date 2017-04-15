@@ -21,6 +21,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import app.mbds.fr.unice.carnfc.R;
+import app.mbds.fr.unice.carnfc.map.mode.ModeGeolocation;
+import app.mbds.fr.unice.carnfc.map.mode.ModeSearchCar;
+import app.mbds.fr.unice.carnfc.map.mode.ModeSearchParking;
 
 /**
  * Created by 53js-Seb on 16/01/2017.
@@ -28,6 +31,11 @@ import app.mbds.fr.unice.carnfc.R;
 
 public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
+    //Mode
+    private ModeGeolocation currentMode;
+    private ModeSearchCar modeSearchCar;
+    private ModeSearchParking modeSearchParking;
 
     private Context context;
     private GoogleApiClient googleApiClient;
@@ -39,6 +47,11 @@ public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
         this.context = context;
         this.googleMap = googleMap;
 
+        //init mode
+        modeSearchParking = new ModeSearchParking(context, googleMap);
+        modeSearchCar = new ModeSearchCar(context, googleMap);
+
+        //Init google api
         googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API)
                 .addOnConnectionFailedListener(this)
@@ -131,4 +144,23 @@ public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
                 new LatLng(loc.getLatitude(), loc.getLongitude()));
         currentLoc = googleMap.addMarker(markerOpt);
     }
+
+    public void activeModeSearchCar(){
+        if(currentMode != null){
+            currentMode.clean();
+        }
+
+        currentMode = modeSearchCar;
+        currentMode.updateGoogleMap();
+    }
+
+    public void activeModeSearchParking(){
+        if(currentMode != null){
+            currentMode.clean();
+        }
+
+        currentMode = modeSearchParking;
+        currentMode.updateGoogleMap();
+    }
+
 }

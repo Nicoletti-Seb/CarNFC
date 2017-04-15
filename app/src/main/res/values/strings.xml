@@ -2,9 +2,14 @@
     <string name="app_name">CarNFC</string>
 
     <!-- url services -->
-    <string name="url_server">192.168.0.12:11111/</string>
+    <string name="url_server">http://192.168.0.9:11111/carnfcapirest/</string>
     <string name="url_service_login">person/login</string>
     <string name="url_service_register">person/add</string>
+    <string name="url_service_cars">car/list</string>
+    <string name="url_service_add_car">car/add</string>
+    <string name="url_service_places">place/list</string>
+    <string name="url_service_add_place">place/add</string>
+
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -34,4 +39,7 @@
     <string name="inscription_error_field_empty">Le champ est vide...</string>
     <string name="inscription_error_identical_password">Mot de passe non identique...</string>
     <string name="inscription_ok">Inscription terminée !</string>
+
+    <!-- Error messages -->
+    <string name="error_parse_json">Erreur: lecture du json</string>
 </resources>
