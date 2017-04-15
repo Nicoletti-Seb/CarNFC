@@ -1,8 +1,11 @@
 package app.mbds.fr.unice.carnfc;
 
+import android.*;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -14,17 +17,28 @@ import android.os.AsyncTask;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.Vibrator;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Locale;
+
+import app.mbds.fr.unice.carnfc.entity.Car;
+import app.mbds.fr.unice.carnfc.entity.Place;
+import app.mbds.fr.unice.carnfc.service.CreateCarTask;
+import app.mbds.fr.unice.carnfc.service.CreatePlaceTask;
+import app.mbds.fr.unice.carnfc.service.ServiceCallback;
 
 public class NFCActivity extends AppCompatActivity {
 
@@ -35,6 +49,7 @@ public class NFCActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_nfcreader);
 
         nfcState = (TextView) findViewById(R.id.nfc_state);
@@ -45,49 +60,7 @@ public class NFCActivity extends AppCompatActivity {
             return;
         }
 
-        new AsyncTask<Void, String, Void>(){
-            @Override
-            protected Void doInBackground(Void... voids) {
-                publishProgress("READING");
-
-                if( ActionNFC.OUT_LOCATION.getAction().equals(readTag(intent)) ){
-                    //TODO: OUT_LOCATION
-
-                    //Write the next action
-                    publishProgress("WRITING SAVE_LOCATION");
-                    writeTag(intent, ActionNFC.SAVE_LOCATION.getAction());
-                    
-                } else {
-
-                    //TODO: SAVE_LOCATION
-
-                    //Write the next action
-                    publishProgress("WRITING OUT_LOCATION");
-                    writeTag(intent, ActionNFC.OUT_LOCATION.getAction());
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(String... values) {
-                nfcState.setText(values[0]);
-
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                Vibrator v = (Vibrator) NFCActivity.this.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(NFCActivity.this.getResources().getInteger(R.integer.delay_vibrator));
-
-                Intent intent = new Intent(NFCActivity.this, HomeActivity.class);
-                startActivity(intent);
-
-                NFCActivity.this.finish();
-            }
-        }.execute();
+        new NfcTask(intent).execute();
     }
 
     private String readTag(Intent intent){
@@ -217,5 +190,107 @@ public class NFCActivity extends AppCompatActivity {
         public String getAction(){
             return action;
         }
+    }
+
+
+    private class NfcTask extends AsyncTask<Void, String, Void> implements GoogleApiClient.ConnectionCallbacks{
+
+        private String actionRead;
+        private Intent intent;
+        private GoogleApiClient googleApiClient;
+
+        private ServiceCallback finishCallback = new ServiceCallback() {
+            @Override
+            public void onCallback() {
+                onFinish();
+            }
+        };
+
+        public NfcTask(Intent intent){
+            this.intent = intent;
+        }
+
+        private boolean checkPermission(){
+            return ActivityCompat.checkSelfPermission(NFCActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                    ||
+                    ActivityCompat.checkSelfPermission(NFCActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            publishProgress("READING");
+            actionRead = readTag(intent);
+
+            if( ActionNFC.OUT_LOCATION.getAction().equals(actionRead) ){
+                //Write the next action
+                publishProgress("WRITING SAVE_LOCATION");
+                writeTag(intent, ActionNFC.SAVE_LOCATION.getAction());
+
+            } else {
+                //Write the next action
+                publishProgress("WRITING OUT_LOCATION");
+                writeTag(intent, ActionNFC.OUT_LOCATION.getAction());
+            }
+
+            publishProgress("UPDATE SERVER");
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            nfcState.setText(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            //Update Serveur
+            googleApiClient = new GoogleApiClient.Builder(NFCActivity.this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .build();
+            googleApiClient.connect();
+        }
+
+        @Override
+        public void onConnected(@Nullable Bundle bundle) {
+            if(!checkPermission()){
+                onFinish();
+                return;
+            }
+
+            Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            {
+                Place place = new Place((float)location.getLatitude(), (float)location.getLongitude());
+                if( ActionNFC.OUT_LOCATION.getAction().equals(actionRead) ){
+                    new CreatePlaceTask(NFCActivity.this, finishCallback).execute(place);
+                }else{
+                    new CreateCarTask(NFCActivity.this, finishCallback).execute(new Car(place));
+                }
+            }
+
+
+        }
+
+        private void onFinish(){
+            //Vibrate the phone
+            Vibrator v = (Vibrator) NFCActivity.this.getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(NFCActivity.this.getResources().getInteger(R.integer.delay_vibrator));
+
+            //Start home activity
+            Intent intent = new Intent(NFCActivity.this, HomeActivity.class);
+            startActivity(intent);
+
+            //Close activity
+            NFCActivity.this.finish();
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {}
+
     }
 }

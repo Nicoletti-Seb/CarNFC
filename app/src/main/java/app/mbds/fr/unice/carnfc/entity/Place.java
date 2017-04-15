@@ -9,6 +9,13 @@ public class Place {
     private float lat;
     private float lon;
 
+    public Place (){}
+
+    public Place(float lat, float lon){
+        this.lat = lat;
+        this.lon = lon;
+    }
+
     public float getLat() {
         return lat;
     }

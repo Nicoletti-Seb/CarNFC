@@ -172,13 +172,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -379,18 +372,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             JsonObject jsonObject = gson.fromJson(success, JsonObject.class);
             System.out.println("reponse content : " + jsonObject);
 
-            /*if (jsonObject.get("success").getAsBoolean()) {
-                Person person = gson.fromJson(jsonObject.get("user"), Person.class);
-                Log.i("Person connected", person.toString());
-
-                Intent i = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(i);
-
-                finish();
-            } else {
-                mPasswordView.setError(jsonObject.get("message").toString());
-                mPasswordView.requestFocus();
-            }*/
+            Intent i = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(i);
         }
 
         @Override

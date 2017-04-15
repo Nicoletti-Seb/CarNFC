@@ -8,11 +8,19 @@ import java.util.Date;
 
 public class Car {
 
-    private String matricule;
-    private String marque;
+    private Person person;
+    private String matricule = "";
+    private String marque = "";
     private Date nextMaintenance;
     private Date endInsurance;
     private Place place;
+
+    public Car(){}
+    public Car(Place place){
+        this.place = place;
+        this.nextMaintenance = new Date();
+        this.endInsurance = new Date();
+    }
 
     public String getMatricule() {
         return matricule;

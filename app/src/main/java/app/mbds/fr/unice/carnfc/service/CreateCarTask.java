@@ -20,12 +20,14 @@ import app.mbds.fr.unice.carnfc.entity.Car;
 
 public class CreateCarTask extends AsyncTask<Car, Void, Boolean>{
 
-    private static final String TAG = "CreateMenuTask";
+    private static final String TAG = "CreateCarTask";
 
     private final Context context;
+    private ServiceCallback callback;
 
-    public CreateCarTask(Context context) {
+    public CreateCarTask(Context context, ServiceCallback callback) {
         this.context = context;
+        this.callback = callback;
     }
 
     @Override
@@ -80,6 +82,10 @@ public class CreateCarTask extends AsyncTask<Car, Void, Boolean>{
             Log.i(TAG, "Car create");
         } else {
             Log.i(TAG, "Error: Car no create");
+        }
+
+        if(callback != null){
+            callback.onCallback();
         }
     }
 }

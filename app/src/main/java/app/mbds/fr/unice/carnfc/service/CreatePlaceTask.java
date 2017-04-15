@@ -20,12 +20,15 @@ import app.mbds.fr.unice.carnfc.entity.Place;
 
 public class CreatePlaceTask extends AsyncTask<Place, Void, Boolean>{
 
-    private static final String TAG = "CreateMenuTask";
+    private static final String TAG = "CreatePlaceTask";
 
-    private final Context context;
 
-    public CreatePlaceTask(Context context) {
+    private Context context;
+    private ServiceCallback callback;
+
+    public CreatePlaceTask(Context context, ServiceCallback callback) {
         this.context = context;
+        this.callback = callback;
     }
 
     @Override
@@ -80,6 +83,10 @@ public class CreatePlaceTask extends AsyncTask<Place, Void, Boolean>{
             Log.i(TAG, "Place create");
         } else {
             Log.i(TAG, "Error: Place no create");
+        }
+
+        if(callback != null){
+            callback.onCallback();
         }
     }
 }

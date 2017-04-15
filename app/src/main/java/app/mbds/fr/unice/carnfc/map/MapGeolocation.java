@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import app.mbds.fr.unice.carnfc.CarNFCApplication;
 import app.mbds.fr.unice.carnfc.R;
 import app.mbds.fr.unice.carnfc.map.mode.ModeGeolocation;
 import app.mbds.fr.unice.carnfc.map.mode.ModeSearchCar;
@@ -31,6 +32,7 @@ import app.mbds.fr.unice.carnfc.map.mode.ModeSearchParking;
 
 public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
 
     //Mode
     private ModeGeolocation currentMode;
@@ -82,8 +84,7 @@ public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
                 ||
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
-
-        }
+    }
 
     public void startLocationUpdate() {
         if(!checkPermission()){
@@ -111,7 +112,6 @@ public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
 
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         updateLocationOnMap(lastLocation);
-
     }
 
     @Override
@@ -133,8 +133,6 @@ public class MapGeolocation implements GoogleApiClient.ConnectionCallbacks,
         if(googleMap == null || loc == null){
             return;
         }
-
-        Toast.makeText(context, "My location update", Toast.LENGTH_LONG).show();
 
         if(currentLoc != null){
             currentLoc.remove();
